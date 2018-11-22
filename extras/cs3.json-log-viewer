@@ -1,0 +1,5 @@
+[transform]
+level=name
+timestamp=time
+message=*
+event=$

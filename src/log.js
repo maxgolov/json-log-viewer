@@ -33,6 +33,9 @@ function transform(entry, _fs=fs) {
 
   return Object.keys(transform).reduce((hash, key) => {
     const value = transform[key];
+    if (value ==="*") {
+      hash[key] = JSON.stringify(entry);
+    } else
     if (value === '$') {
       hash[key] = _.cloneDeep(entry);
     } else {
@@ -51,7 +54,16 @@ function parse(line) {
 }
 
 function readLog(file, reader=fs) {
-  const contents = reader.readFileSync(file).toString();
+  var contents = reader.readFileSync(file).toString();
+  // If contents start with '[', then it's a JSON array
+  if (contents[0]=='[') {
+    const obj = JSON.parse(contents);
+    contents = "";
+    // One log entry per line
+    for (var i = 0; i < obj.length; i++) {
+      contents += JSON.stringify(obj[i]) + '\n';
+    }
+  }
   const lines = _.compact(contents.split('\n').filter(line => line).map(parse));
 
   return lines.map(line => {
